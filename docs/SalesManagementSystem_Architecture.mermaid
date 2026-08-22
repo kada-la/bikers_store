@@ -1,0 +1,36 @@
+%% Sales Management System — Clean Architecture
+flowchart TD
+
+    subgraph Web["SalesManagementSystem.Web  (Presentation)"]
+        Controllers["Controllers<br/>Dashboard · Categories · Customers · Products · Sales · Reports"]
+        Views["Razor Views + Bootstrap 5"]
+        ViewModels["ViewModels"]
+    end
+
+    subgraph Application["SalesManagementSystem.Application"]
+        Services["Services<br/>CategoryService · CustomerService · ProductService · SaleService · ReportService"]
+        Interfaces["Repository & IUnitOfWork interfaces"]
+        Rules["Business rule validation"]
+    end
+
+    subgraph Domain["SalesManagementSystem.Domain"]
+        Entities["Entities<br/>Category · Customer · Product · Sale · SaleItem<br/>(no dependencies)"]
+    end
+
+    subgraph Infrastructure["SalesManagementSystem.Infrastructure"]
+        DbCtx["SalesDbContext (EF Core)"]
+        EFConfig["IEntityTypeConfiguration classes<br/>(maps to store.* schema, incl. computed TotalAmount)"]
+        RepoImpl["Repository + UnitOfWork implementations"]
+    end
+
+    DB[("SQL Server<br/>SALES_DB")]
+
+    Web --> Application
+    Application --> Domain
+    Infrastructure --> Application
+    Infrastructure --> Domain
+    Web -. "DI wiring only (Program.cs)" .-> Infrastructure
+
+    RepoImpl --> DbCtx
+    EFConfig --> DbCtx
+    DbCtx --> DB
