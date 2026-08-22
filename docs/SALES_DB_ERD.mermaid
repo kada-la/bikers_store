@@ -1,0 +1,51 @@
+%% SALES_DB — schema: store.*
+erDiagram
+    CATEGORIES ||--o{ PRODUCTS : contains
+    CUSTOMERS  ||--o{ SALES : places
+    SALES      ||--o{ SALE_ITEMS : contains
+    PRODUCTS   ||--o{ SALE_ITEMS : "sold as"
+
+    CATEGORIES {
+        int CategoryID PK "IDENTITY(1,1)"
+        nvarchar CategoryName "NOT NULL"
+        nvarchar Description
+        bit IsActive "NOT NULL, DEFAULT 1"
+    }
+
+    CUSTOMERS {
+        int CustomerID PK "IDENTITY(1,1)"
+        nvarchar FirstName "NOT NULL"
+        nvarchar LastName "NOT NULL"
+        nvarchar Email UK "NOT NULL, UNIQUE"
+        nvarchar PhoneNumber
+        nvarchar Address
+        nvarchar City
+        nvarchar County
+        nvarchar PostalCode
+        nvarchar Country
+    }
+
+    PRODUCTS {
+        int ProductID PK "IDENTITY(1,1)"
+        nvarchar ProductName "NOT NULL"
+        int CategoryID FK "NOT NULL"
+        nvarchar Description
+        decimal Price "NOT NULL"
+        int StockQuantity "NOT NULL"
+        bit IsActive "NOT NULL, DEFAULT 1"
+    }
+
+    SALES {
+        int SaleID PK "IDENTITY(1,1)"
+        int CustomerID FK "NOT NULL"
+        datetime SaleDate "NOT NULL, DEFAULT GETDATE()"
+    }
+
+    SALE_ITEMS {
+        int SaleItemID PK "IDENTITY(1,1)"
+        int SaleID FK "NOT NULL, ON DELETE CASCADE"
+        int ProductID FK "NOT NULL"
+        int Quantity "NOT NULL"
+        decimal UnitPrice "NOT NULL - price snapshot at sale time"
+        decimal TotalAmount "COMPUTED PERSISTED = Quantity * UnitPrice"
+    }
