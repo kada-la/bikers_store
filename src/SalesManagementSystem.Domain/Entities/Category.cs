@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace SalesManagementSystem.Infrastructure.Data;
+namespace SalesManagementSystem.Domain.Entities;
 
 public partial class Category
 {
@@ -13,5 +13,6 @@ public partial class Category
 
     public bool IsActive { get; set; }
 
+    // Navigation property for the related products
     public virtual ICollection<Product> Products { get; set; } = new List<Product>();
 }

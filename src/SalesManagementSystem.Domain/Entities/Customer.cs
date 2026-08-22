@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace SalesManagementSystem.Infrastructure.Data;
+namespace SalesManagementSystem.Domain.Entities;
 
 public partial class Customer
 {
@@ -25,5 +25,8 @@ public partial class Customer
 
     public string? Country { get; set; }
 
+    public string FullName => $"{FirstName} {LastName}".Trim();
+
+    // Navigation property for the related sales
     public virtual ICollection<Sale> Sales { get; set; } = new List<Sale>();
 }

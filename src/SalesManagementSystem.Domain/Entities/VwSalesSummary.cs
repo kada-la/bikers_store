@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace SalesManagementSystem.Infrastructure.Data;
+namespace SalesManagementSystem.Domain.Entities;
 
 public partial class VwSalesSummary
 {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace SalesManagementSystem.Infrastructure.Data;
+namespace SalesManagementSystem.Domain.Entities;
 
 public partial class SaleItem
 {
@@ -15,8 +15,10 @@ public partial class SaleItem
 
     public decimal UnitPrice { get; set; }
 
+    // Database Persisted Computed Column (Quantity * UnitPrice)
     public decimal? TotalAmount { get; set; }
 
+    // Navigation properties for the related Product and Sale entities
     public virtual Product Product { get; set; } = null!;
 
     public virtual Sale Sale { get; set; } = null!;
