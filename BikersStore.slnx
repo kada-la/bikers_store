@@ -1,5 +1,6 @@
 <Solution>
   <Folder Name="/src/">
+    <Project Path="src/SalesManagementSystem.Application/SalesManagementSystem.Application.csproj" />
     <Project Path="src/SalesManagementSystem.Domain/SalesManagementSystem.Domain.csproj" />
     <Project Path="src/SalesManagementSystem.Infrastructure/SalesManagementSystem.Infrastructure.csproj" />
   </Folder>
