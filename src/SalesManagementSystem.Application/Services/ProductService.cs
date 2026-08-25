@@ -96,4 +96,15 @@ public class ProductService : IProductService
             AvailableCategories = categoryDtos
         };
     }
+
+    public async Task<IReadOnlyList<ProductLookupDto>> GetAvailableForSaleLookupAsync()
+    {
+        // Only return active products with stock > 0 for creating new sales
+        var products = await _unitOfWork.Products.GetAllWithCategoryAsync(includeInactive: false);
+        return products
+            .Where(p => p.StockQuantity > 0)
+            .OrderBy(p => p.ProductName)
+            .Select(p => new ProductLookupDto(p.ProductId, p.ProductName, p.Price, p.StockQuantity, p.Category.CategoryName))
+            .ToList();
+    }
 }
