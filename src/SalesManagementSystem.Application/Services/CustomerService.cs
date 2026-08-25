@@ -135,4 +135,34 @@ public class CustomerService : ICustomerService
 
         return Result.Success(customer.CustomerId);
     }
+
+    public async Task<Result> UpdateAsync(CustomerEditDto model)
+    {
+        if (model == null)
+            return Result.Failure("Invalid customer data.");
+
+        var customer = await _unitOfWork.Customers.GetByIdAsync(model.CustomerId);
+        if (customer == null)
+            return Result.Failure("Customer not found.");
+
+        var email = model.Email.Trim().ToLower();
+        var emailExists = await _unitOfWork.Customers.EmailExistsAsync(email, model.CustomerId);
+        if (emailExists)
+            return Result.Failure($"A customer with email '{model.Email}' already exists.");
+
+        customer.FirstName = model.FirstName.Trim();
+        customer.LastName = model.LastName.Trim();
+        customer.Email = email;
+        customer.PhoneNumber = model.PhoneNumber?.Trim();
+        customer.Address = model.Address?.Trim();
+        customer.City = model.City?.Trim();
+        customer.County = model.County?.Trim();
+        customer.PostalCode = model.PostalCode?.Trim();
+        customer.Country = model.Country?.Trim();
+
+        _unitOfWork.Customers.Update(customer);
+        await _unitOfWork.CompleteAsync();
+
+        return Result.Success();
+    }
 }
