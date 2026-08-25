@@ -50,4 +50,18 @@ public class CategoryService: ICategoryService
             ProductCount = c.Products?.Count ?? 0
         }).OrderBy(c => c.CategoryName).ToList();
     }
+
+    public async Task<CategoryEditDto?> GetForEditAsync(int id)
+    {
+        var category = await _unitOfWork.Categories.GetByIdAsync(id);
+        if (category == null) return null;
+
+        return new CategoryEditDto
+        {
+            CategoryId = category.CategoryId,
+            CategoryName = category.CategoryName,
+            Description = category.Description,
+            IsActive = category.IsActive
+        };
+    }
 }
