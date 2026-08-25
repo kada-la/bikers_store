@@ -96,4 +96,46 @@ public class CategoryService: ICategoryService
     
         return Result.Success(category.CategoryId);
     }
+
+    public async Task<Result> UpdateAsync(CategoryEditDto model)
+    {
+        if (model == null)
+            return Result.Failure("Invalid category data.");
+
+        var category = await _unitOfWork.Categories.GetByIdAsync(model.CategoryId);
+        if (category == null)
+            return Result.Failure("Category not found.");
+
+        var trimmedName = model.CategoryName.Trim();
+        var duplicate = await _unitOfWork.Categories.ExistsAsync(c => 
+            c.CategoryId != model.CategoryId && c.CategoryName.ToLower() == trimmedName.ToLower());
+
+        if (duplicate)
+            return Result.Failure($"Another category with name '{trimmedName}' already exists.");
+
+        category.CategoryName = trimmedName;
+        category.Description = model.Description?.Trim();
+        category.IsActive = model.IsActive;
+
+        _unitOfWork.Categories.Update(category);
+        await _unitOfWork.CompleteAsync();
+
+        return Result.Success();
+    }
+
+    public async Task<Result> SoftDeleteAsync(int id)
+    {
+        var category = await _unitOfWork.Categories.GetByIdAsync(id);
+        if (category == null)
+            return Result.Failure("Category not found.");
+
+        if (!category.IsActive)
+            return Result.Failure("Category is already deactivated.");
+
+        category.IsActive = false;
+        _unitOfWork.Categories.Update(category);
+        await _unitOfWork.CompleteAsync();
+
+        return Result.Success();
+    }
 }
