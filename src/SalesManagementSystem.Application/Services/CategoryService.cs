@@ -73,4 +73,27 @@ public class CategoryService: ICategoryService
             .Select(c => new CategoryLookupDto(c.CategoryId, c.CategoryName))
             .ToList();
     }
+
+    public async Task<Result<int>> CreateAsync(CategoryCreateDto model)
+    {
+        if (model == null)
+            return Result.Failure<int>("Invalid category data.");
+    
+        var trimmedName = model.CategoryName.Trim();
+        var exists = await _unitOfWork.Categories.ExistsAsync(c => c.CategoryName.ToLower() == trimmedName.ToLower());
+        if (exists)
+            return Result.Failure<int>($"Category '{trimmedName}' already exists.");
+    
+        var category = new Category
+        {
+            CategoryName = trimmedName,
+            Description = model.Description?.Trim(),
+            IsActive = model.IsActive
+        };
+    
+        await _unitOfWork.Categories.AddAsync(category);
+        await _unitOfWork.CompleteAsync();
+    
+        return Result.Success(category.CategoryId);
+    }
 }
