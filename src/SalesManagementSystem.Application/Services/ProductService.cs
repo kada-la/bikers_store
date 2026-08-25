@@ -153,4 +153,39 @@ public class ProductService : IProductService
 
         return Result.Success(product.ProductId);
     }
+
+    public async Task<Result> UpdateAsync(ProductEditDto model)
+    {
+        if (model == null)
+            return Result.Failure("Invalid product data.");
+
+        if (model.Price <= 0)
+            return Result.Failure("Product price must be greater than zero.");
+
+        var product = await _unitOfWork.Products.GetByIdAsync(model.ProductId);
+        if (product == null)
+            return Result.Failure("Product not found.");
+
+        var categoryExists = await _unitOfWork.Categories.ExistsAsync(c => c.CategoryId == model.CategoryId);
+        if (!categoryExists)
+            return Result.Failure("Selected category does not exist.");
+
+        var trimmedName = model.ProductName.Trim();
+        var duplicate = await _unitOfWork.Products.ExistsAsync(p => 
+            p.ProductId != model.ProductId && p.ProductName.ToLower() == trimmedName.ToLower());
+        if (duplicate)
+            return Result.Failure($"Another product with name '{trimmedName}' already exists.");
+
+        product.ProductName = trimmedName;
+        product.CategoryId = model.CategoryId;
+        product.Description = model.Description?.Trim();
+        product.Price = model.Price;
+        product.StockQuantity = model.StockQuantity;
+        product.IsActive = model.IsActive;
+
+        _unitOfWork.Products.Update(product);
+        await _unitOfWork.CompleteAsync();
+
+        return Result.Success();
+    }
 }
