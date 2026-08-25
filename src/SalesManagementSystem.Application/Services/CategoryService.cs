@@ -138,4 +138,17 @@ public class CategoryService: ICategoryService
 
         return Result.Success();
     }
+
+    public async Task<Result> ReactivateAsync(int id)
+    {
+        var category = await _unitOfWork.Categories.GetByIdAsync(id);
+        if (category == null)
+            return Result.Failure("Category not found.");
+    
+        category.IsActive = true;
+        _unitOfWork.Categories.Update(category);
+        await _unitOfWork.CompleteAsync();
+    
+        return Result.Success();
+    }
 }
