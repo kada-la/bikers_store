@@ -96,4 +96,14 @@ public class CustomerService : ICustomerService
             Country = customer.Country
         };
     }
+
+    public async Task<IReadOnlyList<CustomerLookupDto>> GetLookupAsync()
+    {
+        var customers = await _unitOfWork.Customers.GetAllAsync();
+        return customers
+            .OrderBy(c => c.LastName)
+            .ThenBy(c => c.FirstName)
+            .Select(c => new CustomerLookupDto(c.CustomerId, c.FullName, c.Email, c.City))
+            .ToList();
+    }
 }
