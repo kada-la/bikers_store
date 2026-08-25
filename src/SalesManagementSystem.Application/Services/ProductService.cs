@@ -33,4 +33,20 @@ public class ProductService : IProductService
             IsActive = p.IsActive
         }).OrderBy(p => p.ProductName).ToList();
     }
+
+    public async Task<IReadOnlyList<ProductListDto>> SearchAndFilterAsync(string? searchTerm, int? categoryId, bool includeInactive = true)
+    {
+        var products = await _unitOfWork.Products.SearchProductsAsync(searchTerm?.Trim(), categoryId, includeInactive);
+        return products.Select(p => new ProductListDto
+        {
+            ProductId = p.ProductId,
+            ProductName = p.ProductName,
+            CategoryId = p.CategoryId,
+            CategoryName = p.Category.CategoryName,
+            Description = p.Description,
+            Price = p.Price,
+            StockQuantity = p.StockQuantity,
+            IsActive = p.IsActive
+        }).OrderBy(p => p.ProductName).ToList();
+    }
 }
