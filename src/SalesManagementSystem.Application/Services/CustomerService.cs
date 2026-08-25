@@ -51,5 +51,30 @@ public class CustomerService : ICustomerService
             TotalOrders = c.Sales?.Count ?? 0
         }).OrderBy(c => c.FullName).ToList();
     }
+
+    public async Task<CustomerDetailsDto?> GetDetailsAsync(int id)
+    {
+        var customer = await _unitOfWork.Customers.GetByIdAsync(id);
+        if (customer == null) return null;
+
+        var sales = await _unitOfWork.Sales.GetByCustomerIdAsync(id);
+        var totalSpend = sales.Sum(s => s.CalculatedTotal);
+
+        return new CustomerDetailsDto
+        {
+            CustomerId = customer.CustomerId,
+            FirstName = customer.FirstName,
+            LastName = customer.LastName,
+            Email = customer.Email,
+            PhoneNumber = customer.PhoneNumber,
+            Address = customer.Address,
+            City = customer.City,
+            County = customer.County,
+            PostalCode = customer.PostalCode,
+            Country = customer.Country,
+            OrderCount = sales.Count,
+            TotalSpend = totalSpend
+        };
+    }
 }
 
