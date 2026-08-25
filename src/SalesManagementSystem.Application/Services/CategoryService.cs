@@ -17,4 +17,20 @@ public class CategoryService: ICategoryService
     {
         _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
     }
+
+    public async Task<IReadOnlyList<CategoryListDto>> GetAllAsync(bool includeInactive = true)
+    {
+        var categories = includeInactive
+            ? await _unitOfWork.Categories.GetAllAsync()
+            : await _unitOfWork.Categories.GetActiveCategoriesAsync();
+
+        return categories.Select(c => new CategoryListDto
+        {
+            CategoryId = c.CategoryId,
+            CategoryName = c.CategoryName,
+            Description = c.Description,
+            IsActive = c.IsActive,
+            ProductCount = c.Products?.Count ?? 0
+        }).OrderBy(c => c.CategoryName).ToList();
+    }
 }
