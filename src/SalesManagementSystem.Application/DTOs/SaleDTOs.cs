@@ -76,4 +76,6 @@ public class SaleItemDetailDto
     public decimal TotalAmount { get; set; }
 }
 
-public record CustomerLookupDto(int CustomerId, string FullName, string Email, string? City);
+public record CountySalesDto(string County, int TransactionCount, decimal TotalRevenue, decimal AvgLineValue);
+public record DailySalesDto(DateTime Date, int TransactionCount, int UnitsSold, decimal TotalRevenue);
+public record MonthlySalesDto(int Year, int Month, string MonthName, int TransactionCount, int UnitsSold, decimal TotalRevenue);

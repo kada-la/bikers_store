@@ -36,3 +36,6 @@ public class CategoryEditDto
 
     public bool IsActive { get; set; }
 }
+
+public record CategoryRevenueDto(string CategoryName, int LineItemsSold, int UnitsSold, decimal TotalRevenue);
+public record CategoryLookupDto(int CategoryId, string CategoryName);

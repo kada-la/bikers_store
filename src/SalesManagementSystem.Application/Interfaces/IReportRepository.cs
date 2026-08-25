@@ -1,16 +1,10 @@
 using SalesManagementSystem.Domain.Entities;
+using SalesManagementSystem.Application.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace SalesManagementSystem.Application.Interfaces;
-
-public record CategoryRevenueDto(string CategoryName, int LineItemsSold, int UnitsSold, decimal TotalRevenue);
-public record TopCustomerDto(int CustomerId, string CustomerName, string? City, string? Country, int TransactionCount, decimal TotalSpend);
-public record CountySalesDto(string County, int TransactionCount, decimal TotalRevenue, decimal AvgLineValue);
-public record DailySalesDto(DateTime Date, int TransactionCount, int UnitsSold, decimal TotalRevenue);
-public record MonthlySalesDto(int Year, int Month, string MonthName, int TransactionCount, int UnitsSold, decimal TotalRevenue);
-public record TopSellingProductDto(int ProductId, string ProductName, string CategoryName, int UnitsSold, decimal TotalRevenue);
 
 public interface IReportRepository
 {

@@ -103,3 +103,6 @@ public class CustomerDetailsDto
     public decimal TotalSpend { get; set; }
     public bool CanDelete => OrderCount == 0;
 }
+
+public record TopCustomerDto(int CustomerId, string CustomerName, string? City, string? Country, int TransactionCount, decimal TotalSpend);
+public record CustomerLookupDto(int CustomerId, string FullName, string Email, string? City);

@@ -83,6 +83,5 @@ public class ProductDetailsDto
     public decimal TotalRevenue { get; set; }
 }
 
-public record CategoryLookupDto(int CategoryId, string CategoryName);
-
 public record ProductLookupDto(int ProductId, string ProductName, decimal Price, int StockQuantity, string CategoryName);
+public record TopSellingProductDto(int ProductId, string ProductName, string CategoryName, int UnitsSold, decimal TotalRevenue);
