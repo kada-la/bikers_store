@@ -16,5 +16,21 @@ public class CustomerService : ICustomerService
     {
         _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
     }
+
+    public async Task<IReadOnlyList<CustomerListDto>> GetAllAsync()
+    {
+        var customers = await _unitOfWork.Customers.GetAllAsync();
+        return customers.Select(c => new CustomerListDto
+        {
+            CustomerId = c.CustomerId,
+            FullName = c.FullName,
+            Email = c.Email,
+            PhoneNumber = c.PhoneNumber,
+            City = c.City,
+            County = c.County,
+            Country = c.Country,
+            TotalOrders = c.Sales?.Count ?? 0
+        }).OrderBy(c => c.FullName).ToList();
+    }
 }
 
