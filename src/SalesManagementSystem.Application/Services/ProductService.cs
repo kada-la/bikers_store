@@ -72,4 +72,28 @@ public class ProductService : IProductService
             TotalRevenue = totalRev
         };
     }
+
+    public async Task<ProductEditDto?> GetForEditAsync(int id)
+    {
+        var product = await _unitOfWork.Products.GetByIdAsync(id);
+        if (product == null) return null;
+
+        var activeCategories = await _unitOfWork.Categories.GetActiveCategoriesAsync();
+        var categoryDtos = activeCategories
+            .OrderBy(c => c.CategoryName)
+            .Select(c => new CategoryLookupDto(c.CategoryId, c.CategoryName))
+            .ToList();
+
+        return new ProductEditDto
+        {
+            ProductId = product.ProductId,
+            ProductName = product.ProductName,
+            CategoryId = product.CategoryId,
+            Description = product.Description,
+            Price = product.Price,
+            StockQuantity = product.StockQuantity,
+            IsActive = product.IsActive,
+            AvailableCategories = categoryDtos
+        };
+    }
 }
