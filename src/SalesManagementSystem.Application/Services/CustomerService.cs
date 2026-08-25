@@ -32,5 +32,24 @@ public class CustomerService : ICustomerService
             TotalOrders = c.Sales?.Count ?? 0
         }).OrderBy(c => c.FullName).ToList();
     }
+
+    public async Task<IReadOnlyList<CustomerListDto>> SearchAsync(string searchTerm)
+    {
+        if (string.IsNullOrWhiteSpace(searchTerm))
+            return await GetAllAsync();
+
+        var customers = await _unitOfWork.Customers.SearchCustomersAsync(searchTerm.Trim());
+        return customers.Select(c => new CustomerListDto
+        {
+            CustomerId = c.CustomerId,
+            FullName = c.FullName,
+            Email = c.Email,
+            PhoneNumber = c.PhoneNumber,
+            City = c.City,
+            County = c.County,
+            Country = c.Country,
+            TotalOrders = c.Sales?.Count ?? 0
+        }).OrderBy(c => c.FullName).ToList();
+    }
 }
 
