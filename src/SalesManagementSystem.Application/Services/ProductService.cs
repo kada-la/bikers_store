@@ -49,4 +49,27 @@ public class ProductService : IProductService
             IsActive = p.IsActive
         }).OrderBy(p => p.ProductName).ToList();
     }
+
+    public async Task<ProductDetailsDto?> GetDetailsAsync(int id)
+    {
+        var product = await _unitOfWork.Products.GetWithCategoryByIdAsync(id);
+        if (product == null) return null;
+
+        var totalSold = product.SaleItems.Sum(si => si.Quantity);
+        var totalRev = product.SaleItems.Sum(si => si.TotalAmount ?? (si.Quantity * si.UnitPrice));
+
+        return new ProductDetailsDto
+        {
+            ProductId = product.ProductId,
+            ProductName = product.ProductName,
+            CategoryId = product.CategoryId,
+            CategoryName = product.Category.CategoryName,
+            Description = product.Description,
+            Price = product.Price,
+            StockQuantity = product.StockQuantity,
+            IsActive = product.IsActive,
+            TotalSoldUnits = totalSold,
+            TotalRevenue = totalRev
+        };
+    }
 }
