@@ -64,4 +64,13 @@ public class CategoryService: ICategoryService
             IsActive = category.IsActive
         };
     }
+
+    public async Task<IReadOnlyList<CategoryLookupDto>> GetActiveLookupAsync()
+    {
+        var active = await _unitOfWork.Categories.GetActiveCategoriesAsync();
+        return active
+            .OrderBy(c => c.CategoryName)
+            .Select(c => new CategoryLookupDto(c.CategoryId, c.CategoryName))
+            .ToList();
+    }
 }
