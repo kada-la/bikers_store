@@ -33,4 +33,21 @@ public class CategoryService: ICategoryService
             ProductCount = c.Products?.Count ?? 0
         }).OrderBy(c => c.CategoryName).ToList();
     }
+
+    public async Task<IReadOnlyList<CategoryListDto>> SearchAsync(string searchTerm, bool includeInactive = true)
+    {
+        if (string.IsNullOrWhiteSpace(searchTerm))
+            return await GetAllAsync(includeInactive);
+
+        var categories = await _unitOfWork.Categories.SearchCategoriesAsync(searchTerm.Trim(), includeInactive);
+
+        return categories.Select(c => new CategoryListDto
+       {
+            CategoryId = c.CategoryId,
+            CategoryName = c.CategoryName,
+            Description = c.Description,
+            IsActive = c.IsActive,
+            ProductCount = c.Products?.Count ?? 0
+        }).OrderBy(c => c.CategoryName).ToList();
+    }
 }
