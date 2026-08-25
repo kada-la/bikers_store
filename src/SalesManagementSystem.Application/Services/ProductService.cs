@@ -112,12 +112,45 @@ public class ProductService : IProductService
     {
         var product = await _unitOfWork.Products.GetWithCategoryByIdAsync(id);
         if (product == null) return null;
-    
+
         return new ProductLookupDto(
             product.ProductId, 
             product.ProductName, 
             product.Price, 
             product.StockQuantity, 
             product.Category?.CategoryName ?? string.Empty);
+    }
+
+    public async Task<Result<int>> CreateAsync(ProductCreateDto model)
+    {
+        if (model == null)
+            return Result.Failure<int>("Invalid product data.");
+
+        if (model.Price <= 0)
+            return Result.Failure<int>("Product price must be greater than zero.");
+
+        var categoryExists = await _unitOfWork.Categories.ExistsAsync(c => c.CategoryId == model.CategoryId && c.IsActive);
+        if (!categoryExists)
+            return Result.Failure<int>("Selected category does not exist or is inactive.");
+
+        var trimmedName = model.ProductName.Trim();
+        var exists = await _unitOfWork.Products.ExistsAsync(p => p.ProductName.ToLower() == trimmedName.ToLower());
+        if (exists)
+            return Result.Failure<int>($"Product with name '{trimmedName}' already exists.");
+
+        var product = new Product
+        {
+            ProductName = trimmedName,
+            CategoryId = model.CategoryId,
+            Description = model.Description?.Trim(),
+            Price = model.Price,
+            StockQuantity = model.StockQuantity,
+            IsActive = model.IsActive
+        };
+
+        await _unitOfWork.Products.AddAsync(product);
+        await _unitOfWork.CompleteAsync();
+
+        return Result.Success(product.ProductId);
     }
 }
