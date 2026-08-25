@@ -106,4 +106,33 @@ public class CustomerService : ICustomerService
             .Select(c => new CustomerLookupDto(c.CustomerId, c.FullName, c.Email, c.City))
             .ToList();
     }
+
+    public async Task<Result<int>> CreateAsync(CustomerCreateDto model)
+    {
+        if (model == null)
+            return Result.Failure<int>("Invalid customer data.");
+
+        var email = model.Email.Trim().ToLower();
+        var emailExists = await _unitOfWork.Customers.EmailExistsAsync(email);
+        if (emailExists)
+            return Result.Failure<int>($"A customer with email '{model.Email}' already exists.");
+
+        var customer = new Customer
+        {
+            FirstName = model.FirstName.Trim(),
+            LastName = model.LastName.Trim(),
+            Email = email,
+            PhoneNumber = model.PhoneNumber?.Trim(),
+            Address = model.Address?.Trim(),
+            City = model.City?.Trim(),
+            County = model.County?.Trim(),
+            PostalCode = model.PostalCode?.Trim(),
+            Country = model.Country?.Trim() ?? "Kenya"
+        };
+
+        await _unitOfWork.Customers.AddAsync(customer);
+        await _unitOfWork.CompleteAsync();
+
+        return Result.Success(customer.CustomerId);
+    }
 }
