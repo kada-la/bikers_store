@@ -194,11 +194,24 @@ public class ProductService : IProductService
         var product = await _unitOfWork.Products.GetByIdAsync(id);
         if (product == null)
             return Result.Failure("Product not found.");
-    
+
         if (!product.IsActive)
             return Result.Failure("Product is already deactivated.");
-    
+
         product.IsActive = false;
+        _unitOfWork.Products.Update(product);
+        await _unitOfWork.CompleteAsync();
+
+        return Result.Success();
+    }
+
+    public async Task<Result> ReactivateAsync(int id)
+    {
+        var product = await _unitOfWork.Products.GetByIdAsync(id);
+        if (product == null)
+            return Result.Failure("Product not found.");
+    
+        product.IsActive = true;
         _unitOfWork.Products.Update(product);
         await _unitOfWork.CompleteAsync();
     
