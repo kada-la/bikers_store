@@ -107,4 +107,17 @@ public class ProductService : IProductService
             .Select(p => new ProductLookupDto(p.ProductId, p.ProductName, p.Price, p.StockQuantity, p.Category.CategoryName))
             .ToList();
     }
+
+    public async Task<ProductLookupDto?> GetProductLookupByIdAsync(int id)
+    {
+        var product = await _unitOfWork.Products.GetWithCategoryByIdAsync(id);
+        if (product == null) return null;
+    
+        return new ProductLookupDto(
+            product.ProductId, 
+            product.ProductName, 
+            product.Price, 
+            product.StockQuantity, 
+            product.Category?.CategoryName ?? string.Empty);
+    }
 }
