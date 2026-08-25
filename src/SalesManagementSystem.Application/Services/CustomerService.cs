@@ -76,5 +76,24 @@ public class CustomerService : ICustomerService
             TotalSpend = totalSpend
         };
     }
-}
 
+    public async Task<CustomerEditDto?> GetForEditAsync(int id)
+    {
+        var customer = await _unitOfWork.Customers.GetByIdAsync(id);
+        if (customer == null) return null;
+
+        return new CustomerEditDto
+        {
+            CustomerId = customer.CustomerId,
+            FirstName = customer.FirstName,
+            LastName = customer.LastName,
+            Email = customer.Email,
+            PhoneNumber = customer.PhoneNumber,
+            Address = customer.Address,
+            City = customer.City,
+            County = customer.County,
+            PostalCode = customer.PostalCode,
+            Country = customer.Country
+        };
+    }
+}
