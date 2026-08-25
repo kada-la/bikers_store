@@ -165,4 +165,23 @@ public class CustomerService : ICustomerService
 
         return Result.Success();
     }
+
+    public async Task<Result> DeleteAsync(int id)
+    {
+        var customer = await _unitOfWork.Customers.GetByIdAsync(id);
+        if (customer == null)
+            return Result.Failure("Customer not found.");
+    
+        // Defensive check: prevent hard deletion if customer has sales records
+        var hasSales = await _unitOfWork.Customers.HasSalesAsync(id);
+        if (hasSales)
+        {
+            return Result.Failure($"Customer '{customer.FullName}' cannot be deleted because they have associated sales records.");
+        }
+    
+        _unitOfWork.Customers.Remove(customer);
+        await _unitOfWork.CompleteAsync();
+    
+        return Result.Success();
+    }
 }
