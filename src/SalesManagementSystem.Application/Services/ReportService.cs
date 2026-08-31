@@ -48,4 +48,31 @@ public class ReportService : IReportService
             DailySalesTrends = dailyTrends
         };
     }
+
+    public async Task<ReportsHubDto> GetReportsHubDataAsync()
+    {
+        var summaries = await _unitOfWork.Reports.GetSalesSummaryAsync();
+        var dailySales = await _unitOfWork.Reports.GetDailySalesAsync(30);
+        var monthlySales = await _unitOfWork.Reports.GetMonthlySalesAsync(12);
+        var topProducts = await _unitOfWork.Reports.GetTopSellingProductsAsync(10);
+        var topCustomers = await _unitOfWork.Reports.GetTopCustomersBySpendAsync(10);
+        var categoryRevenues = await _unitOfWork.Reports.GetRevenueByCategoryAsync();
+        var countySales = await _unitOfWork.Reports.GetSalesByCountyAsync();
+
+        var totalRev = categoryRevenues.Sum(c => c.TotalRevenue);
+        var totalUnits = categoryRevenues.Sum(c => c.UnitsSold);
+
+        return new ReportsHubDto
+        {
+            SalesSummaries = summaries,
+            DailySales = dailySales,
+            MonthlySales = monthlySales,
+            TopSellingProducts = topProducts,
+            TopCustomers = topCustomers,
+            CategoryRevenues = categoryRevenues,
+            CountySales = countySales,
+            TotalRevenue = totalRev,
+            TotalUnitsSold = totalUnits
+        };
+    }
 }
