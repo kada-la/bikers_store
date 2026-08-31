@@ -17,4 +17,19 @@ public class SaleService : ISaleService
     {
         _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
     }
+
+    public async Task<IReadOnlyList<SaleListDto>> GetAllAsync()
+    {
+        var sales = await _unitOfWork.Sales.GetAllWithDetailsAsync();
+        return sales.Select(s => new SaleListDto
+        {
+            SaleId = s.SaleId,
+            CustomerId = s.CustomerId,
+            CustomerName = s.Customer?.FullName ?? "Unknown Customer",
+            CustomerCity = s.Customer?.City,
+            SaleDate = s.SaleDate,
+            TotalItems = s.SaleItems.Sum(si => si.Quantity),
+            TotalAmount = s.CalculatedTotal
+        }).OrderByDescending(s => s.SaleDate).ToList();
+    }
 }
