@@ -62,4 +62,32 @@ public class SaleService : ISaleService
             }).ToList()
         };
     }
+
+    public async Task<SaleCreateDto> PrepareCreateViewModelAsync()
+    {
+        var customers = await _unitOfWork.Customers.GetAllAsync();
+        var customerDtos = customers
+            .OrderBy(c => c.LastName)
+            .ThenBy(c => c.FirstName)
+            .Select(c => new CustomerLookupDto(c.CustomerId, c.FullName, c.Email, c.City))
+            .ToList();
+    
+        var products = await _unitOfWork.Products.GetAllWithCategoryAsync(includeInactive: false);
+        var productDtos = products
+            .Where(p => p.StockQuantity > 0)
+            .OrderBy(p => p.ProductName)
+            .Select(p => new ProductLookupDto(p.ProductId, p.ProductName, p.Price, p.StockQuantity, p.Category?.CategoryName ?? string.Empty))
+            .ToList();
+    
+        return new SaleCreateDto
+        {
+            SaleDate = DateTime.Now,
+            AvailableCustomers = customerDtos,
+            AvailableProducts = productDtos,
+            Items = new List<SaleItemCreateDto>
+            {
+                new SaleItemCreateDto { Quantity = 1 }
+            }
+        };
+    }
 }
