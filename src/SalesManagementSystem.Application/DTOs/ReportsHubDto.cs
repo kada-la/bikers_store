@@ -4,7 +4,7 @@ using SalesManagementSystem.Domain.Entities;
 
 namespace SalesManagementSystem.Application.DTOs;
 
-public class ReportsHubDTO
+public class ReportsHubDto
 {
     public IReadOnlyList<VwSalesSummary> SalesSummaries { get; set; } = new List<VwSalesSummary>();
     public IReadOnlyList<DailySalesDto> DailySales { get; set; } = new List<DailySalesDto>();
