@@ -32,4 +32,34 @@ public class SaleService : ISaleService
             TotalAmount = s.CalculatedTotal
         }).OrderByDescending(s => s.SaleDate).ToList();
     }
+
+    public async Task<SaleDetailsDto?> GetDetailsAsync(int id)
+    {
+        var sale = await _unitOfWork.Sales.GetWithDetailsByIdAsync(id);
+        if (sale == null) return null;
+
+        return new SaleDetailsDto
+        {
+            SaleId = sale.SaleId,
+            CustomerId = sale.CustomerId,
+            CustomerName = sale.Customer.FullName,
+            CustomerEmail = sale.Customer.Email,
+            CustomerPhone = sale.Customer.PhoneNumber,
+            CustomerAddress = sale.Customer.Address,
+            CustomerCity = sale.Customer.City,
+            CustomerCounty = sale.Customer.County,
+            SaleDate = sale.SaleDate,
+            GrandTotal = sale.CalculatedTotal,
+            Items = sale.SaleItems.Select(si => new SaleItemDetailDto
+            {
+                SaleItemId = si.SaleItemId,
+                ProductId = si.ProductId,
+                ProductName = si.Product?.ProductName ?? $"Product #{si.ProductId}",
+                CategoryName = si.Product?.Category?.CategoryName ?? "N/A",
+                Quantity = si.Quantity,
+                UnitPrice = si.UnitPrice,
+                TotalAmount = si.TotalAmount ?? (si.Quantity * si.UnitPrice)
+            }).ToList()
+        };
+    }
 }
