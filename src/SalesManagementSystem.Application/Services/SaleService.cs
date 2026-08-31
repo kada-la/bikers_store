@@ -174,4 +174,37 @@ public class SaleService : ISaleService
             return Result.Failure<int>($"An error occurred while saving the sale: {ex.Message}");
         }
     }
+
+    public async Task<Result> DeleteSaleAsync(int id)
+    {
+        var sale = await _unitOfWork.Sales.GetWithDetailsByIdAsync(id);
+        if (sale == null)
+            return Result.Failure("Sale not found.");
+    
+        await _unitOfWork.BeginTransactionAsync();
+        try
+        {
+            // Restore inventory stock for deleted items
+            foreach (var item in sale.SaleItems)
+            {
+                var product = await _unitOfWork.Products.GetByIdAsync(item.ProductId);
+                if (product != null)
+                {
+                    product.StockQuantity += item.Quantity;
+                    _unitOfWork.Products.Update(product);
+                }
+            }
+    
+            _unitOfWork.Sales.Remove(sale);
+            await _unitOfWork.CompleteAsync();
+            await _unitOfWork.CommitTransactionAsync();
+    
+            return Result.Success();
+        }
+        catch (Exception ex)
+        {
+            await _unitOfWork.RollbackTransactionAsync();
+            return Result.Failure($"Failed to delete sale: {ex.Message}");
+        }
+    }
 }
