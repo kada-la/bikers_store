@@ -90,4 +90,88 @@ public class SaleService : ISaleService
             }
         };
     }
+
+    public async Task<Result<int>> CreateSaleAsync(SaleCreateDto model)
+    {
+        if (model == null)
+            return Result.Failure<int>("Invalid sale request.");
+
+        // 1. Validate Customer
+        var customer = await _unitOfWork.Customers.GetByIdAsync(model.CustomerId);
+        if (customer == null)
+            return Result.Failure<int>("Selected customer does not exist.");
+
+        // 2. Validate Line Items Count
+        var validItems = model.Items?.Where(i => i.ProductId > 0 && i.Quantity > 0).ToList();
+        if (validItems == null || !validItems.Any())
+            return Result.Failure<int>("A sale must contain at least one valid product item.");
+
+        // 3. Begin Atomic Unit of Work Transaction
+        await _unitOfWork.BeginTransactionAsync();
+
+        try
+        {
+            var sale = new Sale
+            {
+                CustomerId = model.CustomerId,
+                SaleDate = model.SaleDate > DateTime.MinValue ? model.SaleDate : DateTime.Now
+            };
+
+            // Group items by product in case user added same product on multiple lines
+            var productGroup = validItems.GroupBy(i => i.ProductId);
+
+            foreach (var group in productGroup)
+            {
+                var productId = group.Key;
+                var totalRequestedQuantity = group.Sum(i => i.Quantity);
+
+                var product = await _unitOfWork.Products.GetByIdAsync(productId);
+                if (product == null)
+                {
+                    await _unitOfWork.RollbackTransactionAsync();
+                    return Result.Failure<int>($"Product with ID {productId} does not exist.");
+                }
+
+                if (!product.IsActive)
+                {
+                    await _unitOfWork.RollbackTransactionAsync();
+                    return Result.Failure<int>($"Product '{product.ProductName}' is inactive and cannot be sold.");
+                }
+
+                if (product.StockQuantity < totalRequestedQuantity)
+                {
+                    await _unitOfWork.RollbackTransactionAsync();
+                    return Result.Failure<int>($"Insufficient stock for '{product.ProductName}'. Requested: {totalRequestedQuantity}, In Stock: {product.StockQuantity}.");
+                }
+
+                // Deduct inventory
+                product.StockQuantity -= totalRequestedQuantity;
+                _unitOfWork.Products.Update(product);
+
+                // Add sale item rows (using product's current catalog price for price snapshot)
+                foreach (var item in group)
+                {
+                    var unitPrice = item.UnitPrice > 0 ? item.UnitPrice : product.Price;
+
+                    sale.SaleItems.Add(new SaleItem
+                    {
+                        ProductId = productId,
+                        Quantity = item.Quantity,
+                        UnitPrice = unitPrice
+                    });
+                }
+            }
+
+            await _unitOfWork.Sales.AddAsync(sale);
+            await _unitOfWork.CompleteAsync();
+            await _unitOfWork.CommitTransactionAsync();
+
+            return Result.Success(sale.SaleId);
+        }
+        catch (Exception ex)
+        {
+            await _unitOfWork.RollbackTransactionAsync();
+            return Result.Failure<int>($"An error occurred while saving the sale: {ex.Message}");
+        }
+    }
 }
