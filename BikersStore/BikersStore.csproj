@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\src\SalesManagementSystem.Infrastructure\SalesManagementSystem.Infrastructure.csproj" />
+    <ProjectReference Include="..\src\SalesManagementSystem.Application\SalesManagementSystem.Application.csproj" />
   </ItemGroup>
 
 </Project>
