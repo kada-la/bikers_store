@@ -35,7 +35,7 @@
                         class="brand-icon-box bg-primary text-white rounded-3 d-flex align-items-center justify-content-center">
                         <i class="bi bi-bicycle fs-4"></i>
                     </div>
-                    <span>BikeStore <span
+                    <span>BikersStore <span
                         class="badge bg-primary-subtle text-primary border border-primary-subtle fs-7 fw-semibold ms-1">Sales
                         DB</span></span>
                     </a>
@@ -96,17 +96,46 @@
                 </div>
             </nav>
         </header>
-        <div class="container">
-            <main role="main" class="pb-3">
-                @RenderBody()
-            </main>
-        </div>
 
-        <footer class="border-top footer text-muted">
-            <div class="container">
-                &copy; 2026 - BikersStore - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+        <!-- Main Container -->
+        <main class="container-fluid px-4 py-4 min-vh-100">
+            <!-- Toast Alerts -->
+            @if (TempData["Success"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm rounded-3 mb-4 d-flex align-items-center gap-2"
+                     role="alert">
+                    <i class="bi bi-check-circle-fill fs-5 text-success"></i>
+                    <div class="fw-medium">@TempData["Success"]</div>
+                    <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+            @if (TempData["Error"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm rounded-3 mb-4 d-flex align-items-center gap-2"
+                     role="alert">
+                    <i class="bi bi-exclamation-triangle-fill fs-5 text-danger"></i>
+                    <div class="fw-medium">@TempData["Error"]</div>
+                    <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+
+            @RenderBody()
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer bg-white border-top py-3 text-muted">
+            <div
+                class="container-fluid px-4 d-flex flex-column flex-sm-row align-items-center justify-content-between text-sm">
+                <span>&copy; 2026 <strong>BikersStore Sales Management System</strong> &bull; CIFOR-ICRAF Internship</span>
+                <!-- <div class="d-flex gap-3 mt-2 mt-sm-0">
+                    <span class="badge bg-light text-secondary border">Clean Architecture</span>
+                    <span class="badge bg-light text-secondary border">.NET 10 LTS</span>
+                    <span class="badge bg-light text-secondary border">EF Core &amp; SQL Server</span>
+                </div> -->
             </div>
         </footer>
+
+        <!-- Core Scripts -->
         <script src="~/lib/jquery/dist/jquery.min.js"></script>
         <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
         <script src="~/js/site.js" asp-append-version="true"></script>
