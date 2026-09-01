@@ -89,3 +89,34 @@
         </div>
     </div>
 </div>
+
+<!-- Charts Row -->
+<div class="row g-4 mb-4">
+    <div class="col-12 col-lg-8">
+        <div class="card border-0 shadow-sm rounded-3 h-100">
+            <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                <h5 class="card-title fw-bold mb-0 text-dark">
+                    <i class="bi bi-graph-up text-primary me-2"></i> Daily Sales Trend (Past 14 Days)
+                </h5>
+                <span class="badge bg-light text-muted border">KES Revenue</span>
+            </div>
+            <div class="card-body p-4">
+                <canvas id="dailySalesChart" style="max-height: 280px;"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 col-lg-4">
+        <div class="card border-0 shadow-sm rounded-3 h-100">
+            <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                <h5 class="card-title fw-bold mb-0 text-dark">
+                    <i class="bi bi-pie-chart text-success me-2"></i> Category Revenue
+                </h5>
+                <span class="badge bg-light text-muted border">Share</span>
+            </div>
+            <div class="card-body p-4 d-flex align-items-center justify-content-center">
+                <canvas id="categoryDonutChart" style="max-height: 260px;"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
