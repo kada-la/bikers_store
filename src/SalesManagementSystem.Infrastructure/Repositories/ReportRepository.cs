@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using SalesManagementSystem.Application.Interfaces;
+using SalesManagementSystem.Application.DTOs;
 using SalesManagementSystem.Domain.Entities;
 using SalesManagementSystem.Infrastructure.Persistence;
 
