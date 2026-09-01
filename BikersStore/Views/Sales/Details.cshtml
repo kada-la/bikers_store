@@ -1,0 +1,128 @@
+@model SaleDetailsDto
+@{
+    ViewData["Title"] = $"Invoice #INV-{Model.SaleId:D4}";
+}
+
+<div class="page-header d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4">
+    <div>
+        <h1 class="page-title mb-1">
+            <i class="bi bi-receipt text-primary me-2"></i> Sale Invoice: #INV-@Model.SaleId.ToString("D4")
+        </h1>
+        <p class="text-muted mb-0">Transaction Date: @Model.SaleDate.ToString("MMMM dd, yyyy HH:mm")</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-action="Index" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Back to Sales
+        </a>
+        <button onclick="window.print()" class="btn btn-outline-primary">
+            <i class="bi bi-printer"></i> Print Invoice
+        </button>
+        <a asp-action="Delete" asp-route-id="@Model.SaleId" class="btn btn-outline-danger">
+            <i class="bi bi-trash"></i> Delete Sale
+        </a>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Invoice Card -->
+    <div class="col-12 col-lg-8">
+        <div class="card border-0 shadow-sm rounded-3">
+            <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="brand-icon-box bg-primary text-white rounded-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                        <i class="bi bi-bicycle fs-5"></i>
+                    </div>
+                    <span class="fw-bold fs-6">BikersStore Sales Receipt</span>
+                </div>
+                <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2 fs-7 fw-bold">
+                    PAID / COMPLETED
+                </span>
+            </div>
+            <div class="card-body p-4">
+                <div class="row mb-4">
+                    <div class="col-sm-6">
+                        <h6 class="text-muted text-uppercase fs-7 fw-bold">Billed To:</h6>
+                        <h5 class="fw-bold mb-1">@Model.CustomerName</h5>
+                        <p class="text-muted mb-0">
+                            <i class="bi bi-envelope me-1"></i> @Model.CustomerEmail<br />
+                            @if (!string.IsNullOrWhiteSpace(Model.CustomerPhone))
+                            {
+                                <span><i class="bi bi-telephone me-1"></i> @Model.CustomerPhone<br /></span>
+                            }
+                            @if (!string.IsNullOrWhiteSpace(Model.CustomerCity))
+                            {
+                                <span><i class="bi bi-geo-alt me-1"></i> @Model.CustomerCity, @Model.CustomerCounty</span>
+                            }
+                        </p>
+                    </div>
+                    <div class="col-sm-6 text-sm-end mt-3 mt-sm-0">
+                        <h6 class="text-muted text-uppercase fs-7 fw-bold">Invoice Details:</h6>
+                        <div class="fw-semibold">Invoice No: <span class="text-dark">#INV-@Model.SaleId.ToString("D4")</span></div>
+                        <div class="text-muted">Sale Date: @Model.SaleDate.ToString("yyyy-MM-dd HH:mm")</div>
+                        <div class="text-muted">Payment: Completed</div>
+                    </div>
+                </div>
+
+                <!-- Line Items Table -->
+                <div class="table-responsive mb-4">
+                    <table class="table table-bordered align-middle">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>#</th>
+                                <th>Product Item</th>
+                                <th>Category</th>
+                                <th class="text-center">Quantity</th>
+                                <th class="text-end">Unit Price</th>
+                                <th class="text-end">Total Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{ int counter = 1; }
+                            @foreach (var item in Model.Items)
+                            {
+                                <tr>
+                                    <td class="text-muted">@counter</td>
+                                    <td class="fw-bold">@item.ProductName</td>
+                                    <td><span class="badge bg-light text-dark border">@item.CategoryName</span></td>
+                                    <td class="text-center fw-semibold">@item.Quantity</td>
+                                    <td class="text-end">KES @item.UnitPrice.ToString("N2")</td>
+                                    <td class="text-end fw-bold text-dark">KES @item.TotalAmount.ToString("N2")</td>
+                                </tr>
+                                counter++;
+                            }
+                        </tbody>
+                        <tfoot>
+                            <tr class="bg-light">
+                                <td colspan="5" class="text-end fw-bold fs-6">Grand Total:</td>
+                                <td class="text-end fw-bold text-success fs-5">KES @Model.GrandTotal.ToString("N2")</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Info Column -->
+    <div class="col-12 col-lg-4">
+        <div class="card border-0 shadow-sm rounded-3 mb-4">
+            <div class="card-header bg-white border-bottom py-3">
+                <h5 class="card-title fw-bold mb-0 text-dark">Customer Profile</h5>
+            </div>
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <div class="rounded-circle bg-primary-subtle text-primary p-3 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+                        <i class="bi bi-person-fill fs-4"></i>
+                    </div>
+                    <div>
+                        <h6 class="mb-0 fw-bold">@Model.CustomerName</h6>
+                        <small class="text-muted">Customer ID: #@Model.CustomerId</small>
+                    </div>
+                </div>
+                <a asp-controller="Customers" asp-action="Details" asp-route-id="@Model.CustomerId" class="btn btn-outline-primary btn-sm w-100">
+                    <i class="bi bi-eye"></i> View Full Customer Profile
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
