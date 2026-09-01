@@ -1,0 +1,89 @@
+@model IReadOnlyList<SaleListDto>
+@{
+    ViewData["Title"] = "Sales Transactions";
+}
+
+<div class="page-header d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4">
+    <div>
+        <h1 class="page-title mb-1"><i class="bi bi-receipt text-primary me-2"></i> Sales Transactions</h1>
+        <p class="text-muted mb-0">Record of all completed customer orders, line items, and database-computed financial
+            totals.</p>
+    </div>
+    <div>
+        <a asp-action="Create" class="btn btn-primary d-flex align-items-center gap-2">
+            <i class="bi bi-plus-circle"></i> Create New Sale
+        </a>
+    </div>
+</div>
+
+<!-- Sales Transactions Table -->
+<div class="card border-0 shadow-sm rounded-3">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Invoice / Sale #</th>
+                    <th>Customer Name</th>
+                    <th>Location</th>
+                    <th>Transaction Date</th>
+                    <th class="text-center">Line Items</th>
+                    <th class="text-end">Total Amount (KES)</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Any())
+                {
+                    @foreach (var s in Model)
+                    {
+                        <tr>
+                            <td>
+                                <a asp-action="Details" asp-route-id="@s.SaleId" class="fw-bold text-dark text-decoration-none">
+                                    <span class="badge bg-light text-primary border fs-7">#INV-@s.SaleId.ToString("D4")</span>
+                                </a>
+                            </td>
+                            <td>
+                                <a asp-controller="Customers" asp-action="Details" asp-route-id="@s.CustomerId" class="fw-semibold text-dark text-decoration-none hover-primary">
+                                    @s.CustomerName
+                                </a>
+                            </td>
+                            <td class="text-muted">
+                                @(string.IsNullOrWhiteSpace(s.CustomerCity) ? "—" : s.CustomerCity)
+                            </td>
+                            <td class="text-muted fs-7">
+                                <i class="bi bi-calendar3 me-1"></i>@s.SaleDate.ToString("MMM dd, yyyy HH:mm")
+                            </td>
+                            <td class="text-center">
+                                <span class="badge bg-secondary-subtle text-secondary fw-semibold">
+                                    @s.TotalItems units
+                                </span>
+                            </td>
+                            <td class="text-end fw-bold text-success fs-6">
+                                KES @s.TotalAmount.ToString("N2")
+                            </td>
+                            <td class="text-end">
+                                <div class="btn-group btn-group-sm">
+                                    <a asp-action="Details" asp-route-id="@s.SaleId" class="btn btn-outline-info" title="View Invoice / Details">
+                                        <i class="bi bi-eye"></i> View
+                                    </a>
+                                    <a asp-action="Delete" asp-route-id="@s.SaleId" class="btn btn-outline-danger" title="Delete Sale">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="7" class="text-center py-5 text-muted">
+                            <i class="bi bi-cart-x fs-2 d-block mb-2"></i>
+                            No sales transactions recorded yet.
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
