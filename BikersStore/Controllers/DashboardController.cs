@@ -1,7 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using SalesManagementSystem.Application.Services;
+using SalesManagementSystem.Application.Interfaces;
 
 namespace BikersStore.Controllers;
 

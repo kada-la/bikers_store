@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
 using SalesManagementSystem.Application.DTOs;
 
-namespace SalesManagementSystem.Application.Services;
+namespace SalesManagementSystem.Application.Interfaces;
 
 public interface IReportService
 {
