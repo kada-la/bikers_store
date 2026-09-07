@@ -1,0 +1,53 @@
+@model SaleDetailsDto
+@{
+    ViewData["Title"] = $"Delete Sale #INV-{Model.SaleId:D4}";
+}
+
+<div class="row justify-content-center">
+    <div class="col-12 col-lg-8">
+        <div class="card border-0 shadow-sm rounded-3 border-danger">
+            <div class="card-header bg-danger text-white py-3">
+                <h5 class="card-title fw-bold mb-0">
+                    <i class="bi bi-trash3-fill me-2"></i> Confirm Sale Deletion
+                </h5>
+            </div>
+            <div class="card-body p-4">
+                <div class="alert alert-warning d-flex align-items-center gap-2 mb-4" role="alert">
+                    <i class="bi bi-info-circle-fill fs-5"></i>
+                    <div>
+                        <strong>Cascading Delete &amp; Inventory Restoration:</strong> Deleting this sale will remove its associated line items (via <code>ON DELETE CASCADE</code>) and restore the corresponding quantities back to product stock levels.
+                    </div>
+                </div>
+
+                <dl class="row mb-4 gy-2">
+                    <dt class="col-sm-4 text-muted">Invoice No:</dt>
+                    <dd class="col-sm-8 fw-bold text-dark">#INV-@Model.SaleId.ToString("D4")</dd>
+
+                    <dt class="col-sm-4 text-muted">Customer:</dt>
+                    <dd class="col-sm-8 fw-semibold">@Model.CustomerName (@Model.CustomerEmail)</dd>
+
+                    <dt class="col-sm-4 text-muted">Sale Date:</dt>
+                    <dd class="col-sm-8 text-muted">@Model.SaleDate.ToString("MMMM dd, yyyy HH:mm")</dd>
+
+                    <dt class="col-sm-4 text-muted">Total Line Items:</dt>
+                    <dd class="col-sm-8"><span class="badge bg-light text-dark border">@Model.Items.Count items (@Model.Items.Sum(i => i.Quantity) units)</span></dd>
+
+                    <dt class="col-sm-4 text-muted">Total Amount:</dt>
+                    <dd class="col-sm-8 fw-bold text-danger fs-5">KES @Model.GrandTotal.ToString("N2")</dd>
+                </dl>
+
+                <form asp-action="Delete" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" value="@Model.SaleId" />
+
+                    <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+                        <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-danger px-4">
+                            <i class="bi bi-trash-fill me-1"></i> Delete Sale &amp; Restore Inventory
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
