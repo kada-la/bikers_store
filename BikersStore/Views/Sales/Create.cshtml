@@ -1,0 +1,242 @@
+@model SaleCreateDto
+@{
+    ViewData["Title"] = "Create New Sale";
+}
+
+<div class="page-header d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4">
+    <div>
+        <h1 class="page-title mb-1"><i class="bi bi-cart-plus text-primary me-2"></i> Create New Sale</h1>
+        <p class="text-muted mb-0">Record a customer order with multiple product line items, automatic pricing, and atomic stock adjustment.</p>
+    </div>
+    <div>
+        <a asp-action="Index" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Back to Sales
+        </a>
+    </div>
+</div>
+
+<form asp-action="Create" method="post" id="saleForm">
+    @Html.AntiForgeryToken()
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+    <div class="row g-4">
+        <!-- Customer & Order Meta Card -->
+        <div class="col-12 col-lg-4">
+            <div class="card border-0 shadow-sm rounded-3 mb-4">
+                <div class="card-header bg-white border-bottom py-3">
+                    <h5 class="card-title fw-bold mb-0 text-dark">
+                        <i class="bi bi-person-check text-primary me-2"></i> Customer Details
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <div class="mb-3">
+                        <label asp-for="CustomerId" class="form-label"></label> <span class="text-danger">*</span>
+                        <select asp-for="CustomerId" class="form-select" id="customerSelect">
+                            <option value="">-- Choose Customer --</option>
+                            @foreach (var c in Model.AvailableCustomers)
+                            {
+                                <option value="@c.CustomerId">@c.FullName (@c.Email)</option>
+                            }
+                        </select>
+                        <span asp-validation-for="CustomerId" class="text-danger fs-7"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="SaleDate" class="form-label"></label> <span class="text-danger">*</span>
+                        <input asp-for="SaleDate" class="form-control" type="datetime-local" value="@Model.SaleDate.ToString("yyyy-MM-ddTHH:mm")" />
+                        <span asp-validation-for="SaleDate" class="text-danger fs-7"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Grand Total Summary Card -->
+            <div class="card border-0 shadow-sm rounded-3 bg-primary text-white p-4">
+                <span class="text-uppercase opacity-75 fs-7 fw-semibold d-block">Order Summary</span>
+                <div class="d-flex justify-content-between align-items-baseline mt-2">
+                    <span class="fs-5 fw-medium">Grand Total:</span>
+                    <h2 class="fw-bold mb-0" id="grandTotalDisplay">KES 0.00</h2>
+                </div>
+                <div class="mt-2 opacity-75 fs-7" id="itemCountDisplay">0 line items</div>
+                <hr class="border-white opacity-25 my-3" />
+                <button type="submit" class="btn btn-light text-primary fw-bold w-100 py-2 shadow-sm">
+                    <i class="bi bi-check-circle-fill me-1"></i> Complete &amp; Save Sale
+                </button>
+            </div>
+        </div>
+
+        <!-- Line Items Card -->
+        <div class="col-12 col-lg-8">
+            <div class="card border-0 shadow-sm rounded-3">
+                <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="card-title fw-bold mb-0 text-dark">
+                        <i class="bi bi-list-check text-primary me-2"></i> Order Line Items
+                    </h5>
+                    <button type="button" class="btn btn-sm btn-outline-primary fw-semibold" id="addRowBtn">
+                        <i class="bi bi-plus-lg"></i> Add Product Line
+                    </button>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0" id="itemsTable">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th style="width: 45%;">Product</th>
+                                    <th style="width: 20%;" class="text-end">Unit Price (KES)</th>
+                                    <th style="width: 15%;" class="text-center">Qty</th>
+                                    <th style="width: 20%;" class="text-end">Subtotal (KES)</th>
+                                    <th style="width: 5%;"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="itemsTableBody">
+                                <!-- Dynamic Rows Inserted Here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card-footer bg-white border-top p-3 d-flex justify-content-between align-items-center">
+                    <button type="button" class="btn btn-sm btn-outline-secondary" id="addRowBtnFooter">
+                        <i class="bi bi-plus-circle me-1"></i> Add Another Item
+                    </button>
+                    <span class="text-muted fs-7"><i class="bi bi-info-circle"></i> Stock inventory is checked and reserved on save.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        // Products lookup dictionary for fast client lookup
+        const availableProducts = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.AvailableProducts));
+
+        let rowIndex = 0;
+
+        function addLineRow(productId = '', quantity = 1, unitPrice = 0) {
+            const currentIdx = rowIndex++;
+            const tbody = document.getElementById('itemsTableBody');
+
+            let productOptions = '<option value="">-- Choose Product --</option>';
+            availableProducts.forEach(p => {
+                const selected = p.ProductId == productId ? 'selected' : '';
+                productOptions += `<option value="${p.ProductId}" data-price="${p.Price}" data-stock="${p.StockQuantity}" ${selected}>${p.ProductName} (Stock: ${p.StockQuantity}, KES ${p.Price.toLocaleString()})</option>`;
+            });
+
+            const tr = document.createElement('tr');
+            tr.id = `row_${currentIdx}`;
+            tr.innerHTML = `
+                <input type="hidden" name="Items.Index" value="${currentIdx}" />
+                <td>
+                    <select name="Items[${currentIdx}].ProductId" class="form-select form-select-sm product-select" data-row="${currentIdx}" required>
+                        ${productOptions}
+                    </select>
+                    <div class="stock-warning text-danger fs-7 mt-1 d-none" id="stockWarning_${currentIdx}"></div>
+                </td>
+                <td class="text-end">
+                    <input type="number" step="0.01" min="0.01" name="Items[${currentIdx}].UnitPrice" id="price_${currentIdx}" class="form-control form-control-sm text-end unit-price-input" value="${unitPrice > 0 ? unitPrice.toFixed(2) : ''}" placeholder="0.00" required readonly />
+                </td>
+                <td>
+                    <input type="number" min="1" max="10000" name="Items[${currentIdx}].Quantity" id="qty_${currentIdx}" class="form-control form-control-sm text-center quantity-input" value="${quantity}" data-row="${currentIdx}" required />
+                </td>
+                <td class="text-end fw-bold text-dark" id="subtotal_${currentIdx}">
+                    KES 0.00
+                </td>
+                <td class="text-center">
+                    <button type="button" class="btn btn-sm btn-link text-danger p-0 remove-row-btn" data-row="${currentIdx}" title="Remove Item">
+                        <i class="bi bi-x-circle-fill fs-5"></i>
+                    </button>
+                </td>
+            `;
+
+            tbody.appendChild(tr);
+            attachRowEvents(currentIdx);
+
+            if (productId) {
+                updateRowPricing(currentIdx);
+            }
+            recalculateGrandTotal();
+        }
+
+        function attachRowEvents(idx) {
+            const productSelect = document.querySelector(`select[name="Items[${idx}].ProductId"]`);
+            const qtyInput = document.getElementById(`qty_${idx}`);
+            const removeBtn = document.querySelector(`.remove-row-btn[data-row="${idx}"]`);
+
+            productSelect.addEventListener('change', function() {
+                updateRowPricing(idx);
+            });
+
+            qtyInput.addEventListener('input', function() {
+                updateRowPricing(idx);
+            });
+
+            removeBtn.addEventListener('click', function() {
+                const tr = document.getElementById(`row_${idx}`);
+                if (document.querySelectorAll('#itemsTableBody tr').length > 1) {
+                    tr.remove();
+                    recalculateGrandTotal();
+                } else {
+                    alert('A sale must have at least one product line item.');
+                }
+            });
+        }
+
+        function updateRowPricing(idx) {
+            const select = document.querySelector(`select[name="Items[${idx}].ProductId"]`);
+            const priceInput = document.getElementById(`price_${idx}`);
+            const qtyInput = document.getElementById(`qty_${idx}`);
+            const subtotalElem = document.getElementById(`subtotal_${idx}`);
+            const stockWarning = document.getElementById(`stockWarning_${idx}`);
+
+            const selectedOption = select.options[select.selectedIndex];
+            const price = parseFloat(selectedOption.getAttribute('data-price')) || 0;
+            const maxStock = parseInt(selectedOption.getAttribute('data-stock')) || 0;
+            const quantity = parseInt(qtyInput.value) || 0;
+
+            if (price > 0) {
+                priceInput.value = price.toFixed(2);
+            }
+
+            if (selectedOption.value && quantity > maxStock) {
+                stockWarning.classList.remove('d-none');
+                stockWarning.textContent = `Warning: Requested (${quantity}) exceeds available stock (${maxStock})!`;
+            } else {
+                stockWarning.classList.add('d-none');
+            }
+
+            const subtotal = price * quantity;
+            subtotalElem.textContent = 'KES ' + subtotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+            recalculateGrandTotal();
+        }
+
+        function recalculateGrandTotal() {
+            let total = 0;
+            let count = 0;
+
+            document.querySelectorAll('#itemsTableBody tr').forEach(tr => {
+                const select = tr.querySelector('.product-select');
+                const qtyInput = tr.querySelector('.quantity-input');
+                const priceInput = tr.querySelector('.unit-price-input');
+
+                if (select && select.value && qtyInput && priceInput) {
+                    const q = parseInt(qtyInput.value) || 0;
+                    const p = parseFloat(priceInput.value) || 0;
+                    total += (q * p);
+                    count++;
+                }
+            });
+
+            document.getElementById('grandTotalDisplay').textContent = 'KES ' + total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            document.getElementById('itemCountDisplay').textContent = `${count} line item(s) selected`;
+        }
+
+        document.getElementById('addRowBtn').addEventListener('click', () => addLineRow());
+        document.getElementById('addRowBtnFooter').addEventListener('click', () => addLineRow());
+
+        // Initialize with one default line row
+        document.addEventListener('DOMContentLoaded', function() {
+            addLineRow();
+        });
+    </script>
+}
