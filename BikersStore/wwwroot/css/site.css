@@ -10,6 +10,19 @@ html {
   }
 }
 
+@media print {
+    header, footer, .page-header, .col-lg-4, .btn {
+        display: none !important;
+    }
+    .col-lg-8 {
+        width: 100% !important;
+    }
+    .card {
+        border: none !important;
+        box-shadow: none !important;
+    }
+}
+
 body {
   margin-bottom: 60px;
   font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
