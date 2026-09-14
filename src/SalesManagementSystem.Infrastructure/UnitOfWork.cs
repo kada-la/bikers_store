@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -18,6 +18,7 @@ public class UnitOfWork : IUnitOfWork
     private IProductRepository? _products;
     private ISaleRepository? _sales;
     private IReportRepository? _reports;
+    private ISupplierRepository? _suppliers;
 
     public UnitOfWork(SalesDbContext context)
     {
@@ -29,6 +30,7 @@ public class UnitOfWork : IUnitOfWork
     public IProductRepository Products => _products ??= new ProductRepository(_context);
     public ISaleRepository Sales => _sales ??= new SaleRepository(_context);
     public IReportRepository Reports => _reports ??= new ReportRepository(_context);
+    public ISupplierRepository Suppliers => _suppliers ??= new SupplierRepository(_context);
 
     public async Task<int> CompleteAsync(CancellationToken cancellationToken = default)
     {

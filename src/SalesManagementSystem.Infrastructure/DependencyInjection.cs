@@ -22,6 +22,12 @@ public static class DependencyInjection
         // Register Unit of Work & Repositories (Scoped lifetime)
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 
+        // Configure Unit4 ERP Options and Typed HttpClient
+        services.Configure<SalesManagementSystem.Application.Common.Unit4Settings>(
+            configuration.GetSection(SalesManagementSystem.Application.Common.Unit4Settings.SectionName));
+
+        services.AddHttpClient<IUnit4SupplierClient, SalesManagementSystem.Infrastructure.ExternalServices.Unit4SupplierClient>();
+
         return services;
     }
 }

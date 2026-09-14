@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using SalesManagementSystem.Domain.Entities;
 using System.Reflection;
 
@@ -20,6 +20,8 @@ public partial class SalesDbContext : DbContext
     public virtual DbSet<Sale> Sales => Set<Sale>();
 
     public virtual DbSet<SaleItem> SaleItems => Set<SaleItem>();
+
+    public virtual DbSet<Supplier> Suppliers => Set<Supplier>();
 
     public virtual DbSet<VwSalesSummary> VwSalesSummaries => Set<VwSalesSummary>();
 
