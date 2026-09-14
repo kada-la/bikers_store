@@ -1,0 +1,332 @@
+// Source: https://ubw-preview.unit4cloud.com/uk_pgr_prev_webapi/swagger/ui/index#/
+// JSON Documentation: https://ubw-preview.unit4cloud.com/uk_pgr_prev_webapi/documentation/swagger/v1/
+// Chunked from the full list only suppliers endpoints
+{
+    "/v1/suppliers": {
+      "post": {
+        "tags": [
+          "Supplier"
+        ],
+        "summary": "Creates supplier based on a sent object",
+        "operationId": "Supplier_Create",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/xml",
+          "text/xml",
+          "application/x-www-form-urlencoded",
+          "multipart/form-data"
+        ],
+        "produces": [
+          "application/json",
+          "text/json",
+          "application/xml",
+          "text/xml"
+        ],
+        "parameters": [
+          {
+            "name": "supplier",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Agresso.Financials.CustomerSupplier.PublicApi.Web.Http.Dto.Supplier.SupplierDto"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "schema": {
+              "$ref": "#/definitions/Agresso.Financials.CustomerSupplier.PublicApi.Web.Http.Dto.Supplier.SupplierDto"
+            }
+          },
+          "400": {
+            "description": "BadRequest",
+            "schema": {
+              "$ref": "#/definitions/U4.PublicApiFramework.Core.Errors.NotificationInfo"
+            }
+          },
+          "404": {
+            "description": "NotFound",
+            "schema": {
+              "$ref": "#/definitions/U4.PublicApiFramework.Core.Errors.NotificationInfo"
+            }
+          },
+          "410": {
+            "description": "Gone",
+            "schema": {
+              "$ref": "#/definitions/U4.PublicApiFramework.Core.Errors.NotificationInfo"
+            }
+          },
+          "422": {
+            "description": "UnprocessableEntity",
+            "schema": {
+              "$ref": "#/definitions/Agresso.Financials.CustomerSupplier.PublicApi.Web.Http.Dto.Supplier.SupplierDto"
+            }
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/v1/suppliers/{supplierId}": {
+      "get": {
+        "tags": [
+          "Supplier"
+        ],
+        "summary": "Retrieves supplier based on its ID and company ID",
+        "operationId": "Supplier_Get",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "application/xml",
+          "text/xml"
+        ],
+        "parameters": [
+          {
+            "name": "supplierId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "companyId",
+            "in": "query",
+            "description": "Company id",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Agresso.Financials.CustomerSupplier.PublicApi.Web.Http.Dto.Supplier.SupplierDto"
+            }
+          },
+          "400": {
+            "description": "BadRequest",
+            "schema": {
+              "$ref": "#/definitions/U4.PublicApiFramework.Core.Errors.NotificationInfo"
+            }
+          },
+          "404": {
+            "description": "NotFound",
+            "schema": {
+              "$ref": "#/definitions/U4.PublicApiFramework.Core.Errors.NotificationInfo"
+            }
+          },
+          "410": {
+            "description": "Gone",
+            "schema": {
+              "$ref": "#/definitions/U4.PublicApiFramework.Core.Errors.NotificationInfo"
+            }
+          }
+        },
+        "deprecated": false
+      },
+      "delete": {
+        "tags": [
+          "Supplier"
+        ],
+        "summary": "Supplier will be closed (status is set to C) based on its ID and company ID",
+        "operationId": "Supplier_Delete",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "application/xml",
+          "text/xml"
+        ],
+        "parameters": [
+          {
+            "name": "supplierId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "companyId",
+            "in": "query",
+            "description": "Company id",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/System.Object"
+            }
+          },
+          "400": {
+            "description": "BadRequest",
+            "schema": {
+              "$ref": "#/definitions/U4.PublicApiFramework.Core.Errors.NotificationInfo"
+            }
+          },
+          "404": {
+            "description": "NotFound",
+            "schema": {
+              "$ref": "#/definitions/U4.PublicApiFramework.Core.Errors.NotificationInfo"
+            }
+          },
+          "410": {
+            "description": "Gone",
+            "schema": {
+              "$ref": "#/definitions/U4.PublicApiFramework.Core.Errors.NotificationInfo"
+            }
+          }
+        },
+        "deprecated": false
+      },
+      "patch": {
+        "tags": [
+          "Supplier"
+        ],
+        "summary": "Updates supplier based on its ID and company ID according to changes specified in patch document",
+        "operationId": "Supplier_Update",
+        "consumes": [
+          "application/json-patch+json"
+        ],
+        "produces": [
+          "application/json",
+          "text/json",
+          "application/xml",
+          "text/xml"
+        ],
+        "parameters": [
+          {
+            "name": "supplierId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "patch",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/U4.PublicApiFramework.Core.JsonPatch.PatchOperation"
+              }
+            }
+          },
+          {
+            "name": "companyId",
+            "in": "query",
+            "description": "Company id",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Agresso.Financials.CustomerSupplier.PublicApi.Web.Http.Dto.Supplier.SupplierDto"
+            }
+          },
+          "400": {
+            "description": "BadRequest",
+            "schema": {
+              "$ref": "#/definitions/U4.PublicApiFramework.Core.Errors.NotificationInfo"
+            }
+          },
+          "404": {
+            "description": "NotFound",
+            "schema": {
+              "$ref": "#/definitions/U4.PublicApiFramework.Core.Errors.NotificationInfo"
+            }
+          },
+          "410": {
+            "description": "Gone",
+            "schema": {
+              "$ref": "#/definitions/U4.PublicApiFramework.Core.Errors.NotificationInfo"
+            }
+          },
+          "422": {
+            "description": "UnprocessableEntity",
+            "schema": {
+              "$ref": "#/definitions/Agresso.Financials.CustomerSupplier.PublicApi.Web.Http.Dto.Supplier.SupplierDto"
+            }
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/v1/objects/suppliers": {
+      "get": {
+        "tags": [
+          "Supplier"
+        ],
+        "summary": "Party delivering a product or a service.",
+        "description": "Party delivering a product or a service.",
+        "operationId": "Objects_GetSuppliers",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "application/xml",
+          "text/xml"
+        ],
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "select",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "filter",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "orderBy",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Unit4.BusinessWorld.PublicApi.Objects.Supplier"
+              }
+            }
+          },
+          "400": {
+            "description": "BadRequest",
+            "schema": {
+              "$ref": "#/definitions/U4.PublicApiFramework.Core.Errors.NotificationInfo"
+            }
+          }
+        },
+        "deprecated": false
+      }
+    }
+}
