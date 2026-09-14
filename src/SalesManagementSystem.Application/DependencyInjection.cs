@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using SalesManagementSystem.Application.Interfaces;
 using SalesManagementSystem.Application.Services;
 
@@ -13,6 +13,7 @@ public static class DependencyInjection
         services.AddScoped<IProductService, ProductService>();
         services.AddScoped<ISaleService, SaleService>();
         services.AddScoped<IReportService, ReportService>();
+        services.AddScoped<ISupplierService, SupplierService>();
 
         return services;
     }

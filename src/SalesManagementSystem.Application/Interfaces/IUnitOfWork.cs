@@ -11,6 +11,7 @@ public interface IUnitOfWork : IDisposable
 	IProductRepository Products { get; }
 	ISaleRepository Sales { get; }
 	IReportRepository Reports { get; }
+	ISupplierRepository Suppliers { get; }
 
 	Task<int> CompleteAsync(CancellationToken cancellationToken = default);
 	Task BeginTransactionAsync();
