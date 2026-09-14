@@ -4,5 +4,6 @@
     <Project Path="src/SalesManagementSystem.Domain/SalesManagementSystem.Domain.csproj" />
     <Project Path="src/SalesManagementSystem.Infrastructure/SalesManagementSystem.Infrastructure.csproj" />
   </Folder>
+  <Project Path="BikersStore.WebApi/BikersStore.WebApi.csproj" />
   <Project Path="BikersStore/BikersStore.csproj" />
 </Solution>
