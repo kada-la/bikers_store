@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace SalesManagementSystem.Domain.Entities;
 
@@ -29,4 +30,6 @@ public partial class Supplier
     public DateTime? LastSyncedAtUtc { get; set; }
 
     public bool IsActive => string.Equals(Status, "N", StringComparison.OrdinalIgnoreCase);
+
+    public virtual ICollection<Product> Products { get; set; } = new List<Product>();
 }
