@@ -18,6 +18,7 @@ public class ProductRepository : GenericRepository<Product>, IProductRepository
     {
         var query = _dbSet
             .Include(p => p.Category)
+            .Include(p => p.Supplier)
             .AsQueryable();
 
         if (!includeInactive)
@@ -32,6 +33,7 @@ public class ProductRepository : GenericRepository<Product>, IProductRepository
     {
         var query = _dbSet
             .Include(p => p.Category)
+            .Include(p => p.Supplier)
             .Where(p => p.CategoryId == categoryId);
 
         if (!includeInactive)
@@ -46,6 +48,7 @@ public class ProductRepository : GenericRepository<Product>, IProductRepository
     {
         var query = _dbSet
             .Include(p => p.Category)
+            .Include(p => p.Supplier)
             .AsQueryable();
 
         if (!includeInactive)
@@ -72,6 +75,7 @@ public class ProductRepository : GenericRepository<Product>, IProductRepository
     {
         return await _dbSet
             .Include(p => p.Category)
+            .Include(p => p.Supplier)
             .Include(p => p.SaleItems)
             .FirstOrDefaultAsync(p => p.ProductId == id);
     }

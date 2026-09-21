@@ -38,5 +38,15 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
             .HasForeignKey(p => p.CategoryId)
             .OnDelete(DeleteBehavior.ClientSetNull)
             .HasConstraintName("FK_Products_Categories");
+
+        builder.Property(p => p.SupplierId)
+            .HasColumnName("SupplierId")
+            .HasMaxLength(50);
+
+        builder.HasOne(p => p.Supplier)
+            .WithMany(s => s.Products)
+            .HasForeignKey(p => p.SupplierId)
+            .OnDelete(DeleteBehavior.SetNull)
+            .HasConstraintName("FK_Products_Suppliers");
     }
 }
