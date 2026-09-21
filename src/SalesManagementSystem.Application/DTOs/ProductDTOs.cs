@@ -9,6 +9,8 @@ public class ProductListDto
     public string ProductName { get; set; } = string.Empty;
     public int CategoryId { get; set; }
     public string CategoryName { get; set; } = string.Empty;
+    public string? SupplierId { get; set; }
+    public string? SupplierName { get; set; }
     public string? Description { get; set; }
     public decimal Price { get; set; }
     public int StockQuantity { get; set; }
@@ -25,6 +27,8 @@ public class ProductCreateDto
     [Range(1, int.MaxValue, ErrorMessage = "Please select a valid category.")]
     public int CategoryId { get; set; }
 
+    public string? SupplierId { get; set; }
+
     [StringLength(255, ErrorMessage = "Description cannot exceed 255 characters.")]
     public string? Description { get; set; }
 
@@ -39,6 +43,7 @@ public class ProductCreateDto
     public bool IsActive { get; set; } = true;
 
     public IReadOnlyList<CategoryLookupDto> AvailableCategories { get; set; } = new List<CategoryLookupDto>();
+    public IReadOnlyList<SupplierLookupDto> AvailableSuppliers { get; set; } = new List<SupplierLookupDto>();
 }
 
 public class ProductEditDto
@@ -52,6 +57,9 @@ public class ProductEditDto
     [Required(ErrorMessage = "Category is required.")]
     [Range(1, int.MaxValue, ErrorMessage = "Please select a valid category.")]
     public int CategoryId { get; set; }
+
+    public string? SupplierId { get; set; }
+    public string? SupplierName { get; set; }
 
     [StringLength(255, ErrorMessage = "Description cannot exceed 255 characters.")]
     public string? Description { get; set; }
@@ -67,6 +75,7 @@ public class ProductEditDto
     public bool IsActive { get; set; }
 
     public IReadOnlyList<CategoryLookupDto> AvailableCategories { get; set; } = new List<CategoryLookupDto>();
+    public IReadOnlyList<SupplierLookupDto> AvailableSuppliers { get; set; } = new List<SupplierLookupDto>();
 }
 
 public class ProductDetailsDto
@@ -75,6 +84,8 @@ public class ProductDetailsDto
     public string ProductName { get; set; } = string.Empty;
     public int CategoryId { get; set; }
     public string CategoryName { get; set; } = string.Empty;
+    public string? SupplierId { get; set; }
+    public string? SupplierName { get; set; }
     public string? Description { get; set; }
     public decimal Price { get; set; }
     public int StockQuantity { get; set; }
@@ -83,5 +94,5 @@ public class ProductDetailsDto
     public decimal TotalRevenue { get; set; }
 }
 
-public record ProductLookupDto(int ProductId, string ProductName, decimal Price, int StockQuantity, string CategoryName);
+public record ProductLookupDto(int ProductId, string ProductName, decimal Price, int StockQuantity, string CategoryName, string? SupplierName = null);
 public record TopSellingProductDto(int ProductId, string ProductName, string CategoryName, int UnitsSold, decimal TotalRevenue);

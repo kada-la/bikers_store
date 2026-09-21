@@ -26,7 +26,9 @@ public class ProductService : IProductService
             ProductId = p.ProductId,
             ProductName = p.ProductName,
             CategoryId = p.CategoryId,
-            CategoryName = p.Category.CategoryName,
+            CategoryName = p.Category?.CategoryName ?? string.Empty,
+            SupplierId = p.SupplierId,
+            SupplierName = p.Supplier?.SupplierName,
             Description = p.Description,
             Price = p.Price,
             StockQuantity = p.StockQuantity,
@@ -42,7 +44,9 @@ public class ProductService : IProductService
             ProductId = p.ProductId,
             ProductName = p.ProductName,
             CategoryId = p.CategoryId,
-            CategoryName = p.Category.CategoryName,
+            CategoryName = p.Category?.CategoryName ?? string.Empty,
+            SupplierId = p.SupplierId,
+            SupplierName = p.Supplier?.SupplierName,
             Description = p.Description,
             Price = p.Price,
             StockQuantity = p.StockQuantity,
@@ -63,7 +67,9 @@ public class ProductService : IProductService
             ProductId = product.ProductId,
             ProductName = product.ProductName,
             CategoryId = product.CategoryId,
-            CategoryName = product.Category.CategoryName,
+            CategoryName = product.Category?.CategoryName ?? string.Empty,
+            SupplierId = product.SupplierId,
+            SupplierName = product.Supplier?.SupplierName,
             Description = product.Description,
             Price = product.Price,
             StockQuantity = product.StockQuantity,
@@ -75,7 +81,7 @@ public class ProductService : IProductService
 
     public async Task<ProductEditDto?> GetForEditAsync(int id)
     {
-        var product = await _unitOfWork.Products.GetByIdAsync(id);
+        var product = await _unitOfWork.Products.GetWithCategoryByIdAsync(id);
         if (product == null) return null;
 
         var activeCategories = await _unitOfWork.Categories.GetActiveCategoriesAsync();
@@ -84,16 +90,26 @@ public class ProductService : IProductService
             .Select(c => new CategoryLookupDto(c.CategoryId, c.CategoryName))
             .ToList();
 
+        var activeSuppliers = await _unitOfWork.Suppliers.GetAllAsync();
+        var supplierDtos = activeSuppliers
+            .Where(s => s.IsActive)
+            .OrderBy(s => s.SupplierName)
+            .Select(s => new SupplierLookupDto(s.SupplierId, s.SupplierName, s.City, s.IsActive))
+            .ToList();
+
         return new ProductEditDto
         {
             ProductId = product.ProductId,
             ProductName = product.ProductName,
             CategoryId = product.CategoryId,
+            SupplierId = product.SupplierId,
+            SupplierName = product.Supplier?.SupplierName,
             Description = product.Description,
             Price = product.Price,
             StockQuantity = product.StockQuantity,
             IsActive = product.IsActive,
-            AvailableCategories = categoryDtos
+            AvailableCategories = categoryDtos,
+            AvailableSuppliers = supplierDtos
         };
     }
 
@@ -104,7 +120,13 @@ public class ProductService : IProductService
         return products
             .Where(p => p.StockQuantity > 0)
             .OrderBy(p => p.ProductName)
-            .Select(p => new ProductLookupDto(p.ProductId, p.ProductName, p.Price, p.StockQuantity, p.Category.CategoryName))
+            .Select(p => new ProductLookupDto(
+                p.ProductId, 
+                p.ProductName, 
+                p.Price, 
+                p.StockQuantity, 
+                p.Category?.CategoryName ?? string.Empty,
+                p.Supplier?.SupplierName))
             .ToList();
     }
 
@@ -118,7 +140,8 @@ public class ProductService : IProductService
             product.ProductName, 
             product.Price, 
             product.StockQuantity, 
-            product.Category?.CategoryName ?? string.Empty);
+            product.Category?.CategoryName ?? string.Empty,
+            product.Supplier?.SupplierName);
     }
 
     public async Task<Result<int>> CreateAsync(ProductCreateDto model)
@@ -133,6 +156,13 @@ public class ProductService : IProductService
         if (!categoryExists)
             return Result.Failure<int>("Selected category does not exist or is inactive.");
 
+        if (!string.IsNullOrWhiteSpace(model.SupplierId))
+        {
+            var supplierExists = await _unitOfWork.Suppliers.ExistsAsync(model.SupplierId.Trim());
+            if (!supplierExists)
+                return Result.Failure<int>("Selected supplier does not exist.");
+        }
+
         var trimmedName = model.ProductName.Trim();
         var exists = await _unitOfWork.Products.ExistsAsync(p => p.ProductName.ToLower() == trimmedName.ToLower());
         if (exists)
@@ -142,6 +172,7 @@ public class ProductService : IProductService
         {
             ProductName = trimmedName,
             CategoryId = model.CategoryId,
+            SupplierId = string.IsNullOrWhiteSpace(model.SupplierId) ? null : model.SupplierId.Trim(),
             Description = model.Description?.Trim(),
             Price = model.Price,
             StockQuantity = model.StockQuantity,
@@ -170,6 +201,13 @@ public class ProductService : IProductService
         if (!categoryExists)
             return Result.Failure("Selected category does not exist.");
 
+        if (!string.IsNullOrWhiteSpace(model.SupplierId))
+        {
+            var supplierExists = await _unitOfWork.Suppliers.ExistsAsync(model.SupplierId.Trim());
+            if (!supplierExists)
+                return Result.Failure("Selected supplier does not exist.");
+        }
+
         var trimmedName = model.ProductName.Trim();
         var duplicate = await _unitOfWork.Products.ExistsAsync(p => 
             p.ProductId != model.ProductId && p.ProductName.ToLower() == trimmedName.ToLower());
@@ -178,6 +216,7 @@ public class ProductService : IProductService
 
         product.ProductName = trimmedName;
         product.CategoryId = model.CategoryId;
+        product.SupplierId = string.IsNullOrWhiteSpace(model.SupplierId) ? null : model.SupplierId.Trim();
         product.Description = model.Description?.Trim();
         product.Price = model.Price;
         product.StockQuantity = model.StockQuantity;
